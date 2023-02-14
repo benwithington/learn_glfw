@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.23)
+set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+project(learn_glfw)
+add_executable(learn_glfw main.cpp)
+find_package(glfw3 CONFIG REQUIRED)
+target_link_libraries(learn_glfw PRIVATE glfw)
