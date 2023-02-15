@@ -18,6 +18,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
 
   if (key == GLFW_KEY_W && action == GLFW_PRESS) {
     glfwSetWindowMonitor(window, nullptr, 100, 100, 800, 600, 0);
+    const char *key_name = glfwGetKeyName(GLFW_KEY_W, 0);
+    std::cout << "W key is called: " << key_name << '\n';
   }
 
   if (key == GLFW_KEY_I && action == GLFW_PRESS) {
@@ -55,6 +57,18 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
     } else {
       glfwSetWindowAttrib(window, GLFW_DECORATED, GLFW_TRUE);
     }
+  }
+
+  if (key == GLFW_KEY_H && action == GLFW_PRESS) {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+  }
+
+  if (key == GLFW_KEY_N && action == GLFW_PRESS) {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+  }
+
+  if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   }
 }
 
@@ -128,6 +142,21 @@ void window_focus_callback(GLFWwindow *window, int focused) {
   }
 }
 
+void framebuffer_size_callack(GLFWwindow *window, int width, int height) {
+  std::cout << "New Framebuffer Width: " << width << ", Height: " << height
+            << '\n';
+}
+
+void cursor_position_callback(GLFWwindow *window, double xpos, double ypos) {
+  std::cout << "Cursor Position, X: " << xpos << ", Y: " << ypos << '\n';
+}
+
+void drop_callback(GLFWwindow *window, int count, const char **paths) {
+  for (int i = 0; i < count; ++i) {
+    std::cout << "Path " << i << ": " << paths[i] << '\n';
+  }
+}
+
 int main() {
   /*
    *  Initialize the library
@@ -187,6 +216,9 @@ int main() {
   glfwSetWindowIconifyCallback(window.get(), window_iconify_callback);
   glfwSetWindowMaximizeCallback(window.get(), window_maximised_callback);
   glfwSetWindowFocusCallback(window.get(), window_focus_callback);
+  glfwSetFramebufferSizeCallback(window.get(), framebuffer_size_callack);
+  // glfwSetCursorPosCallback(window.get(), cursor_position_callback);
+  glfwSetDropCallback(window.get(), drop_callback);
 
   // Other glfw functionality
   glfwSetWindowTitle(window.get(), "ｇｌｆｗ");
@@ -194,10 +226,37 @@ int main() {
   /* Make the window's context current */
   glfwMakeContextCurrent(window.get());
 
+  // Timing stuff
+  std::uint64_t timer_value = glfwGetTimerValue();
+  std::uint64_t timer_frequency = glfwGetTimerFrequency();
+
+  std::cout << "Timer Value: " << timer_value << '\n'
+            << "Time Frequency: " << timer_frequency << '\n';
+
+  // clipboard input/output
+  const char *clipboard_text = glfwGetClipboardString(nullptr);
+  if (clipboard_text) {
+    std::cout << "From clipboard: " << clipboard_text << '\n';
+  }
+
+  glfwSetClipboardString(nullptr, "A string with words in it");
+
+  clipboard_text = glfwGetClipboardString(nullptr);
+  if (clipboard_text) {
+    std::cout << "From clipboard: " << clipboard_text << '\n';
+  }
+
+  int count{0};
   /* Loop until the user closes the window */
   while (!glfwWindowShouldClose(window.get())) {
     /* Render here */
     // glClear(GL_COLOR_BUFFER_BIT);
+
+    int state = glfwGetKey(window.get(), GLFW_KEY_E);
+    if (state == GLFW_PRESS) {
+      ++count;
+      std::cout << count << ": Pressed from inside main loop.\n";
+    }
 
     /* Swap front and back buffers */
     glfwSwapBuffers(window.get());
